@@ -12,9 +12,6 @@ model = joblib.load('Models/linearR_model.pkl')
 class PlayerData(BaseModel):
     appearance: int
     minutes_played: int
-    goals: float
-    assists:int
-    games_injured: int
     award: int
     highest_value: int
 
@@ -22,16 +19,12 @@ def preprocessing(input_data: PlayerData):
     # Convert input data to a numpy array
     features = np.array([
         input_data.appearance,
-        input_data.goals,
-        input_data.assists,
         input_data.minutes_played,
-        input_data.games_injured,
         input_data.award,
         input_data.highest_value
     ]).reshape(1, -1)  # Reshape for a single prediction
     return features
 
-selected_features = ['appearance', 'goals', 'assists', 'minutes played', 'games_injured', 'award', 'current_value', 'highest_value']
 
 @app.post("/predict")
 def predict(input_data: PlayerData):
@@ -45,4 +38,4 @@ def predict(input_data: PlayerData):
 # Optional: A simple endpoint to check if the API is running
 @app.get("/")
 def root():
-    return {"message": "Player Value Prediction API is running"}
+    return {"message": "Player Value Prediction."}
