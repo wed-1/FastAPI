@@ -1,44 +1,48 @@
-from fastapi import FastAPI, HTTPException
-import requests
-import joblib
+from fastapi import FastAPI
 from pydantic import BaseModel
+import joblib
+import numpy as np
 
-model = joblib.load('Log_Reg.joblib')
-scaler = joblib.load('Scaler.joblib')
 app = FastAPI()
 
-# GET request
-@app.get("/")
 
-def read_root():
-    return {"message": "Welcome to Tuwaiq Academy"}
-# get request
+# Load the pre-trained model
+model = joblib.load('Models/linearR_model.pkl')
 
-@app.get("/try/{item_id}")
-async def read_item(item_id):
-    return {"item_id": item_id}
+class PlayerData(BaseModel):
+    appearance: int
+    minutes_played: int
+    goals: float
+    assists:int
+    games_injured: int
+    award: int
+    highest_value: int
 
-class InputFeatures(BaseModel):
-    Engine_Size: float
-    Mileage: float
+def preprocessing(input_data: PlayerData):
+    # Convert input data to a numpy array
+    features = np.array([
+        input_data.appearance,
+        input_data.goals,
+        input_data.assists,
+        input_data.minutes_played,
+        input_data.games_injured,
+        input_data.award,
+        input_data.highest_value
+    ]).reshape(1, -1)  # Reshape for a single prediction
+    return features
 
-
-def preprocessing(input_features: InputFeatures):
-    dict_f = {
-                'Engine_Size': input_features.Engine_Size,
-                'Mileage': input_features.Mileage,
-}
-    feature_list = [dict_f[key] for key in sorted(dict_f)]
-    return scaler.transform([list(dict_f.values())])
-
-@app.get("/predict")
-def predict(input_features: InputFeatures):
-    return preprocessing(input_features)
-
+selected_features = ['appearance', 'goals', 'assists', 'minutes played', 'games_injured', 'award', 'current_value', 'highest_value']
 
 @app.post("/predict")
-async def predict(input_features: InputFeatures):
-    data = preprocessing(input_features)
-    y_pred = model.predict(data)
-    return {"pred": y_pred.tolist()[0]}
+def predict(input_data: PlayerData):
+    try:
+        features = preprocessing(input_data)
+        prediction = model.predict(features)
+        return {"pred": prediction[0]}
+    except Exception as e:
+        return {"error": str(e)}
 
+# Optional: A simple endpoint to check if the API is running
+@app.get("/")
+def root():
+    return {"message": "Player Value Prediction API is running"}
