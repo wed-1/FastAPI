@@ -22,7 +22,7 @@ def preprocessing(input_data: PlayerData):
         input_data.appearance,
         input_data.minutes_played,
         input_data.award,
-        data.current_value,
+        input_data.current_value,
         input_data.highest_value
     ]).reshape(1, -1)  # Reshape for a single prediction
     return features

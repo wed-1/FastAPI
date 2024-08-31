@@ -3,7 +3,7 @@ import requests
 import json
 
 # Set the page configuration
-st.set_page_config(page_title="Player Value Prediction", page_icon="⚽", layout="wide")
+st.set_page_config(page_title="Player Value Prediction", layout="wide")
 
 # Add a header with a subheader
 st.title("Player Value Prediction :soccer:")
